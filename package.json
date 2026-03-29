@@ -1,0 +1,16 @@
+{
+  "name": "floor3-quiz-backend",
+  "version": "1.0.0",
+  "description": "Quiz generation backend for Floor 3 - The Mechanical Soul",
+  "main": "api/quiz.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
