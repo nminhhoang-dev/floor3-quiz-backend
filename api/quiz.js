@@ -26,7 +26,7 @@ const { callGemini } = require("../lib/geminiClient");
 const { getFallback } = require("../lib/fallbackQuiz");
 
 const VALID_TOPICS = ["technology", "biology", "ethics"];
-const GEMINI_TIMEOUT_MS = 8000; 
+const GEMINI_TIMEOUT_MS = 15000; 
 
 module.exports = async function handler(req, res) {
     // ── CORS Headers (required for Unity WebGL builds) ────────────
