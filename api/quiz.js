@@ -23,7 +23,6 @@
 
 const { buildPrompt } = require("../lib/promptBuilder");
 const { callGemini } = require("../lib/geminiClient");
-const { getFallback } = require("../lib/fallbackQuiz");
 
 const VALID_TOPICS = ["technology", "biology", "ethics"];
 const GEMINI_TIMEOUT_MS = 10000; 
@@ -65,27 +64,21 @@ module.exports = async function handler(req, res) {
     }
 
     // ── Call Gemini with timeout ───────────────────────────────────
+    // api/quiz.js — bỏ fallback, trả 500 thẳng khi Gemini fail
     try {
         const quizData = await Promise.race([
             callGemini(prompt),
             timeoutReject(GEMINI_TIMEOUT_MS, "Gemini API timeout"),
         ]);
-
-        // Add source marker so Unity/logs can see where data came from
+    
         quizData.source = "gemini";
-
         console.log(`[Quiz API] Gemini success — ${quizData.quizzes.length} quizzes returned.`);
         return res.status(200).json(quizData);
-
+    
     } catch (err) {
-        // ── Fallback: Gemini failed or timed out ──────────────────────
-        console.warn(`[Quiz API] Gemini failed (${err.message}) → using fallback.`);
-
-        const fallback = getFallback(topic);
-        return res.status(200).json(fallback);
-        // NOTE: We return 200 with fallback, not 500.
-        // Unity should always receive valid quiz data.
-        // The "source" field will be "fallback" so we can log it.
+        // Trả 500 thẳng — Unity nhận error → MockQuizGenerator tự kick in
+        console.error(`[Quiz API] Gemini failed: ${err.message}`);
+        return res.status(500).json({ error: err.message });
     }
 };
 
